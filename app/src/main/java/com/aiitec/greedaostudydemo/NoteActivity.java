@@ -60,6 +60,20 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
 
         setUpViews();
 
+//        App.getInstance().newCachedThreadPool().execute(new Runnable() {
+//            //子线程执行
+//            @Override
+//            public void run() {
+//                //主线程执行
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//                });
+//            }
+//        });
+
         // get the note DAO
         DaoSession daoSession = ((App) getApplication()).getDaoSession();
         noteDao = daoSession.getNoteDao();
@@ -75,9 +89,9 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
                 this);
         listPopupWindow.setAdapter(
                 new ArrayAdapter(
-                this,
-                android.R.layout.simple_list_item_1,
-                operations));
+                        this,
+                        android.R.layout.simple_list_item_1,
+                        operations));
         listPopupWindow.setWidth(400);
         listPopupWindow.setHeight(400);
         listPopupWindow.setModal(true);
@@ -85,6 +99,11 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
                 NoteActivity.this);
 
 
+    }
+
+    private void showPopList(View anchorView) {
+        listPopupWindow.setAnchorView(anchorView);
+        listPopupWindow.show();
     }
 
     private void updateNotes() {
@@ -177,6 +196,7 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
 
     /**
      * listPopwindow item click
+     *
      * @param parent
      * @param view
      * @param position

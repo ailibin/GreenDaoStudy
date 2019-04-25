@@ -7,6 +7,9 @@ import com.aiitec.greedaostudydemo.model.DaoSession;
 
 import org.greenrobot.greendao.database.Database;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @Author: ailibin
  * @Time: 2019/04/18
@@ -17,13 +20,25 @@ public class App extends Application {
 
     private DaoSession daoSession;
 
+    private ExecutorService cachedThreadPool;
+
+    private static App app;
+
+    public static App getInstance() {
+        return app;
+    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
 
+        app = this;
         // regular SQLite database
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
         Database db = helper.getWritableDb();
+
+        cachedThreadPool = Executors.newCachedThreadPool();
 
         // encrypted SQLCipher database
         // note: you need to add SQLCipher to your dependencies, check the build.gradle file
@@ -44,6 +59,10 @@ public class App extends Application {
 
     public DaoSession getDaoSession() {
         return daoSession;
+    }
+
+    public ExecutorService newCachedThreadPool() {
+        return cachedThreadPool;
     }
 
 
