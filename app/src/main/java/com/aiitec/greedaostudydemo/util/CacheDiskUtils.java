@@ -11,7 +11,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.blankj.utilcode.constant.CacheConstants;
+import com.aiitec.greedaostudydemo.constant.CacheConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

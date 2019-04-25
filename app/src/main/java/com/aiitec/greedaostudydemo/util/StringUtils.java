@@ -160,7 +160,9 @@ public final class StringUtils {
      * @return the DBC string
      */
     public static String toDBC(final String s) {
-        if (s == null || s.length() == 0) return "";
+        if (s == null || s.length() == 0) {
+            return "";
+        }
         char[] chars = s.toCharArray();
         for (int i = 0, len = chars.length; i < len; i++) {
             if (chars[i] == 12288) {

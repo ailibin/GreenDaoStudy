@@ -19,13 +19,20 @@ import java.util.List;
  * @Description: 测试
  * @Email: ailibin@qq.com
  */
-public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder>{
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
     private NoteClickListener clickListener;
+    private OnNoteLongClickListener longClickListener;
     private List<Note> dataset;
 
     public interface NoteClickListener {
         void onNoteClick(int position);
+    }
+
+    public interface OnNoteLongClickListener {
+
+        void onNoteLongClick(int position, View view);
+
     }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
@@ -33,7 +40,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         public TextView text;
         public TextView comment;
 
-        public NoteViewHolder(View itemView, final NoteClickListener clickListener) {
+        public NoteViewHolder(View itemView, final NoteClickListener clickListener, final OnNoteLongClickListener longClickListener) {
             super(itemView);
             text = (TextView) itemView.findViewById(R.id.textViewNoteText);
             comment = (TextView) itemView.findViewById(R.id.textViewNoteComment);
@@ -45,13 +52,30 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
                     }
                 }
             });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (longClickListener != null) {
+                        longClickListener.onNoteLongClick(getAdapterPosition(), v);
+                    }
+                    return false;
+                }
+            });
         }
     }
 
-    public NotesAdapter(NoteClickListener clickListener) {
+    public NotesAdapter(NoteClickListener clickListener, OnNoteLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
         this.clickListener = clickListener;
         this.dataset = new ArrayList<Note>();
     }
+
+    public NotesAdapter(OnNoteLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
+        this.dataset = new ArrayList<Note>();
+    }
+
 
     public void setNotes(@NonNull List<Note> notes) {
         dataset = notes;
@@ -66,7 +90,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     public NotesAdapter.NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_note, parent, false);
-        return new NoteViewHolder(view, clickListener);
+        return new NoteViewHolder(view, clickListener, longClickListener);
     }
 
     @Override

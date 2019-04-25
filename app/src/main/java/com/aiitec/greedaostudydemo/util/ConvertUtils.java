@@ -11,8 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.blankj.utilcode.constant.MemoryConstants;
-import com.blankj.utilcode.constant.TimeConstants;
+import com.aiitec.greedaostudydemo.constant.MemoryConstants;
+import com.aiitec.greedaostudydemo.constant.TimeConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

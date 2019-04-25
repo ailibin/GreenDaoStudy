@@ -108,7 +108,9 @@ public final class BrightnessUtils {
     public static int getWindowBrightness(final Window window) {
         WindowManager.LayoutParams lp = window.getAttributes();
         float brightness = lp.screenBrightness;
-        if (brightness < 0) return getBrightness();
+        if (brightness < 0) {
+            return getBrightness();
+        }
         return (int) (brightness * 255);
     }
 }

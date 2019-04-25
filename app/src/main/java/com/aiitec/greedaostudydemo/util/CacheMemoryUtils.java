@@ -3,7 +3,7 @@ package com.aiitec.greedaostudydemo.util;
 import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
-import com.blankj.utilcode.constant.CacheConstants;
+import com.aiitec.greedaostudydemo.constant.CacheConstants;
 
 import java.util.HashMap;
 import java.util.Map;

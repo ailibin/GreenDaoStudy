@@ -420,7 +420,9 @@ public final class ToastUtils {
                 new Utils.OnActivityDestroyedListener() {
                     @Override
                     public void onActivityDestroyed(Activity activity) {
-                        if (iToast == null) return;
+                        if (iToast == null) {
+                            return;
+                        }
                         iToast.cancel();
                     }
                 };
@@ -432,7 +434,9 @@ public final class ToastUtils {
         @Override
         public void show() {
             mView = mToast.getView();
-            if (mView == null) return;
+            if (mView == null) {
+                return;
+            }
             final Context context = mToast.getView().getContext();
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) {
                 mWM = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);

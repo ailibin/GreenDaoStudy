@@ -92,7 +92,9 @@ public final class IntentUtils {
      * @return the intent of install app
      */
     public static Intent getInstallAppIntent(final File file, final boolean isNewTask) {
-        if (file == null) return null;
+        if (file == null) {
+            return null;
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri data;
         String type = "application/vnd.android.package-archive";
@@ -149,7 +151,9 @@ public final class IntentUtils {
      */
     public static Intent getLaunchAppIntent(final String packageName, final boolean isNewTask) {
         Intent intent = Utils.getApp().getPackageManager().getLaunchIntentForPackage(packageName);
-        if (intent == null) return null;
+        if (intent == null) {
+            return null;
+        }
         return getIntent(intent, isNewTask);
     }
 

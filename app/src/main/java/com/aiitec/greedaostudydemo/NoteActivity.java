@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,8 @@ import com.aiitec.greedaostudydemo.enu.NoteType;
 import com.aiitec.greedaostudydemo.model.DaoSession;
 import com.aiitec.greedaostudydemo.model.Note;
 import com.aiitec.greedaostudydemo.model.NoteDao;
+import com.aiitec.greedaostudydemo.util.KeyboardUtils;
+import com.aiitec.greedaostudydemo.util.StringUtils;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -39,15 +42,20 @@ import java.util.List;
  */
 public class NoteActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
+    private static final String TAG = "ailibin";
+
     private EditText editText;
-    private View addNoteButton;
+    private View addNoteButton, queryNotebutton, tvEmpty;
 
     private NoteDao noteDao;
     private Query<Note> notesQuery;
     private NotesAdapter notesAdapter;
+    private RecyclerView recyclerView;
 
     private ListPopupWindow listPopupWindow;
-    private String[] operations = {"增加", "删除", "更新"};
+    private String[] operations = {"删除", "更新"};
+
+    private Note clickNote;
 
     @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     @Override
@@ -56,30 +64,21 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
 
         setContentView(R.layout.activity_note);
 
+        //关闭软件盘
+        KeyboardUtils.hideSoftInput(this);
+
         initListPopWindow();
 
         setUpViews();
-
-//        App.getInstance().newCachedThreadPool().execute(new Runnable() {
-//            //子线程执行
-//            @Override
-//            public void run() {
-//                //主线程执行
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                    }
-//                });
-//            }
-//        });
 
         // get the note DAO
         DaoSession daoSession = ((App) getApplication()).getDaoSession();
         noteDao = daoSession.getNoteDao();
 
-        // query all notes, sorted a-z by their text
-        notesQuery = noteDao.queryBuilder().orderAsc(NoteDao.Properties.Text).build();
+        // query all notes, sorted a-z by their Date 升序排列
+//        notesQuery = noteDao.queryBuilder().orderAsc(NoteDao.Properties.Date).build();
+        //query all notes, sorted a-z by their Date 降序排列
+        notesQuery = noteDao.queryBuilder().orderDesc(NoteDao.Properties.Date).build();
         updateNotes();
     }
 
@@ -93,7 +92,7 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
                         android.R.layout.simple_list_item_1,
                         operations));
         listPopupWindow.setWidth(400);
-        listPopupWindow.setHeight(400);
+        listPopupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         listPopupWindow.setModal(true);
         listPopupWindow.setOnItemClickListener(
                 NoteActivity.this);
@@ -113,15 +112,17 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @RequiresApi(api = Build.VERSION_CODES.CUPCAKE)
     protected void setUpViews() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewNotes);
+        recyclerView = findViewById(R.id.recyclerViewNotes);
         //noinspection ConstantConditions
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        notesAdapter = new NotesAdapter(noteClickListener);
+        notesAdapter = new NotesAdapter(noteClickListener, noteLongClickListener);
         recyclerView.setAdapter(notesAdapter);
 
         addNoteButton = findViewById(R.id.buttonAdd);
+        queryNotebutton = findViewById(R.id.buttonQuery);
+        tvEmpty = findViewById(R.id.tvEmpty);
         //noinspection ConstantConditions
         addNoteButton.setEnabled(false);
 
@@ -154,12 +155,47 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        //add button
         addNoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addNote();
             }
         });
+
+        //query button
+        queryNotebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                queryNote();
+            }
+        });
+
+    }
+
+    private void queryNote() {
+
+        String noteText = editText.getText().toString();
+        editText.setText("");
+
+        if (StringUtils.isEmpty(noteText)) {
+            updateNotes();
+            return;
+        }
+        //根据text字段查找,查询一个集合,这里是模糊查询,如果要精确查询
+        List<Note> queryNotes = noteDao.queryBuilder().where(NoteDao.Properties.Text.like(noteText + "%")).list();
+        //精确查询
+//        List<Note> queryNotes = noteDao.queryBuilder().where(NoteDao.Properties.Text.eq(noteText)).list();
+        if (queryNotes == null || queryNotes.size() <= 0) {
+            showEmpty();
+        }
+        notesAdapter.setNotes(queryNotes);
+
+    }
+
+    private void showEmpty() {
+        recyclerView.setVisibility(View.GONE);
+        tvEmpty.setVisibility(View.VISIBLE);
     }
 
 
@@ -177,7 +213,7 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
         note.setDate(new Date());
         note.setType(NoteType.TEXT);
         noteDao.insert(note);
-        Log.d("DaoExample", "Inserted new note, ID: " + note.getId());
+        Log.d(TAG, "Inserted new note, ID: " + note.getId());
         updateNotes();
 
     }
@@ -186,11 +222,19 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public void onNoteClick(int position) {
 
-            Note note = notesAdapter.getNote(position);
-            Long noteId = note.getId();
-            noteDao.deleteByKey(noteId);
-            Log.d("DaoExample", "Deleted note, ID: " + noteId);
-            updateNotes();
+//            Note note = notesAdapter.getNote(position);
+//            Long noteId = note.getId();
+//            noteDao.deleteByKey(noteId);
+//            Log.d("DaoExample", "Deleted note, ID: " + noteId);
+//            updateNotes();
+        }
+    };
+
+    NotesAdapter.OnNoteLongClickListener noteLongClickListener = new NotesAdapter.OnNoteLongClickListener() {
+        @Override
+        public void onNoteLongClick(int position, View view) {
+            clickNote = notesAdapter.getNote(position);
+            showPopList(view);
         }
     };
 
@@ -206,13 +250,18 @@ public class NoteActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
             case 0:
-                //增加
+                //删除,批量删除后面再做
+                Long noteId = clickNote.getId();
+                noteDao.deleteByKey(noteId);
+//                noteDao.deleteByKeyInTx();
+                updateNotes();
                 break;
             case 1:
-                //删除
-                break;
-            case 2:
-                //更新
+                //更新,批量修改后面再加上去
+                clickNote.setText("123");
+                noteDao.update(clickNote);
+//                noteDao.updateInTx(clickNote);
+                updateNotes();
                 break;
             default:
                 break;

@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.blankj.utilcode.constant.CacheConstants;
+import com.aiitec.greedaostudydemo.constant.CacheConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

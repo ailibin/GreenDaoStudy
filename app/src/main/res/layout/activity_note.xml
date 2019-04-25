@@ -4,40 +4,66 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="none">
+    <!--<android.support.v4.widget.NestedScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:scrollbars="none">-->
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <EditText
+            android:id="@+id/editTextNote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:hint="请输入数据" />
 
+        <Button
+            android:id="@+id/buttonAdd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="添加数据" />
 
-            <EditText
-                android:id="@+id/editTextNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="请输入数据" />
+        <Button
+            android:id="@+id/buttonQuery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="查询数据" />
 
-            <Button
-                android:id="@+id/buttonAdd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="添加数据" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerViewNotes"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" />
+                android:drawableTop="@drawable/ic_photo_black_24dp"
+                android:drawablePadding="10dp"
+                android:gravity="center"
+                android:text="暂无数据"
+                android:visibility="gone" />
 
-        </LinearLayout>
+
+        </RelativeLayout>
 
 
-    </android.support.v4.widget.NestedScrollView>
+    </LinearLayout>
+
+
+    <!--</android.support.v4.widget.NestedScrollView>-->
 
 
 </LinearLayout>
